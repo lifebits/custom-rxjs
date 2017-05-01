@@ -12,18 +12,30 @@ const observer = {
     }
 };
 
-function startReceivingData(obs) {
-    //[1,2,3,4,5].forEach(next);
-    let counts = 0;
-    const intervalId = setInterval(() => {
-        counts++;
-        obs.next(counts);
+const arrayObservable = {
+    //sync data source
+    subscribe: function startReceivingData(obs) {
+        [1,2,12,9,6].forEach(obs.next);
+        obs.complete();
+    }
+};
 
-        if (counts >= 5) {
-            clearInterval(intervalId);
-            obs.complete();
-        }
-    }, 300)
-}
+const intervalObservable = {
+    //async data source
+    subscribe: function startReceivingData(obs) {
+        //[1,2,3,4,5].forEach(next);
+        let counts = 0;
+        const intervalId = setInterval(() => {
+            counts++;
+            obs.next(counts);
 
-startReceivingData(observer);
+            if (counts >= 5) {
+                clearInterval(intervalId);
+                obs.complete();
+            }
+        }, 300)
+    }
+};
+
+
+arrayObservable.subscribe(observer);
