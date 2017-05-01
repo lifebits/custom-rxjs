@@ -12,17 +12,20 @@ const observer = {
     }
 };
 
-const arrayObservable = {
-    //sync data source
-    subscribe: function startReceivingData(obs) {
-        [1,2,12,9,6].forEach(obs.next);
-        obs.complete();
+function createObservable(subscribeFn) {
+    return {
+        subscribe: subscribeFn
     }
-};
+}
 
-const intervalObservable = {
-    //async data source
-    subscribe: function startReceivingData(obs) {
+//sync data source
+const arrayObservable = createObservable(function startReceivingData(obs) {
+    [1, 2, 12, 9, 6].forEach(obs.next);
+    obs.complete();
+});
+
+//async data source
+const intervalObservable = createObservable(function startReceivingData(obs) {
         //[1,2,3,4,5].forEach(next);
         let counts = 0;
         const intervalId = setInterval(() => {
@@ -34,8 +37,7 @@ const intervalObservable = {
                 obs.complete();
             }
         }, 300)
-    }
-};
+});
 
 
-arrayObservable.subscribe(observer);
+intervalObservable.subscribe(observer);
