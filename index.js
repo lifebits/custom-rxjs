@@ -12,8 +12,22 @@ const observer = {
     }
 };
 
+function mapFn(transformationFn) {
+    const inputObservable = this;
+    const outputObservable = createObservable(function subscribe(obs) {
+        inputObservable.subscribe({
+            next: (x) => obs.next(transformationFn(x)),
+            complete: () => obs.complete,
+            error: (err) => obs.error(err)
+        });
+    });
+
+    return outputObservable;
+}
+
 function createObservable(subscribeFn) {
     return {
+        map: mapFn,
         subscribe: subscribeFn
     }
 }
@@ -26,7 +40,6 @@ const arrayObservable = createObservable(function startReceivingData(obs) {
 
 //async data source
 const intervalObservable = createObservable(function startReceivingData(obs) {
-        //[1,2,3,4,5].forEach(next);
         let counts = 0;
         const intervalId = setInterval(() => {
             counts++;
@@ -40,4 +53,6 @@ const intervalObservable = createObservable(function startReceivingData(obs) {
 });
 
 
-intervalObservable.subscribe(observer);
+intervalObservable
+    .map(x => x * 10)
+    .subscribe(observer);
